@@ -3,6 +3,7 @@ import 'inventory_page.dart';
 import 'category_page.dart';
 import '../services/user_service.dart';
 import 'login_page.dart';
+import 'chatbot_page.dart';
 
 /// Halaman dashboard utama
 class DashboardPage extends StatelessWidget {
@@ -42,6 +43,16 @@ class DashboardPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const Text(
+                'Inventario🤌',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.indigo,
+                ),
+              ),
+              const SizedBox(height: 24),
               Card(
                 elevation: 8,
                 shape: RoundedRectangleBorder(
@@ -100,6 +111,16 @@ class DashboardPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'chatbot',
+        backgroundColor: Colors.deepPurple,
+        child: const Icon(Icons.chat, color: Colors.white),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const ChatbotPage()),
+          );
+        },
       ),
     );
   }

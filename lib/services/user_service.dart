@@ -9,6 +9,7 @@ class UserService {
   static const String tokenKey = 'token';
   static const String accessTokenKey = 'access_token';
   static const String refreshTokenKey = 'refresh_token';
+  static const String userIdKey = 'user_id';
 
   /// Login user, return accessToken jika sukses
   Future<String?> login(String email, String password) async {
@@ -22,7 +23,10 @@ class UserService {
         final data = jsonDecode(response.body);
         if (data['accessToken'] != null && data['refreshToken'] != null) {
           await saveTokens(data['accessToken'], data['refreshToken']);
-          return data['accessToken'];
+        }
+        // Save userId if available
+        if (data['user'] != null && data['user']['id'] != null) {
+          await saveUserId(data['user']['id'].toString());
         }
         return data['accessToken'] ?? data['token'];
       } else {
@@ -45,6 +49,10 @@ class UserService {
         final data = jsonDecode(response.body);
         if (data['accessToken'] != null && data['refreshToken'] != null) {
           await saveTokens(data['accessToken'], data['refreshToken']);
+        }
+        // Save userId if available
+        if (data['user'] != null && data['user']['id'] != null) {
+          await saveUserId(data['user']['id'].toString());
         }
         return true;
       }
@@ -117,6 +125,21 @@ class UserService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(accessTokenKey);
     await prefs.remove(refreshTokenKey);
+  }
+
+  static Future<void> saveUserId(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(userIdKey, userId);
+  }
+
+  static Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(userIdKey);
+  }
+
+  static Future<void> clearUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(userIdKey);
   }
 
   /// Mengganti access token yang baru menggunakan refresh token

@@ -54,16 +54,40 @@ class _EditItemPageState extends State<EditItemPage> {
     final categories = await CategoryService().getCategories(token);
     setState(() {
       _categories = categories;
-      _selectedCategoryId = widget.item.categoryId;
+      _selectedCategoryId = widget.item.categoryId.toString();
     });
   }
 
   Future<void> _pickImage() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() {
-        _imageFile = File(picked.path);
-      });
+    final source = await showDialog<ImageSource>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Pilih Sumber Gambar'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text('Kamera'),
+                  onTap: () => Navigator.pop(context, ImageSource.camera),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library),
+                  title: const Text('Galeri'),
+                  onTap: () => Navigator.pop(context, ImageSource.gallery),
+                ),
+              ],
+            ),
+          ),
+    );
+    if (source != null) {
+      final picked = await ImagePicker().pickImage(source: source);
+      if (picked != null) {
+        setState(() {
+          _imageFile = File(picked.path);
+        });
+      }
     }
   }
 
@@ -79,7 +103,7 @@ class _EditItemPageState extends State<EditItemPage> {
       description: _descriptionController.text,
       imageUrl: _imageFile?.path ?? '',
       quantity: int.tryParse(_quantityController.text) ?? 0,
-      categoryId: _selectedCategoryId ?? '',
+      categoryId: int.tryParse(_selectedCategoryId ?? '0') ?? 0,
       createdBy: widget.item.createdBy,
       createdAt: widget.item.createdAt,
     );
@@ -210,12 +234,12 @@ class _EditItemPageState extends State<EditItemPage> {
                         fit: BoxFit.cover,
                       ),
                     )
-                    : (widget.item.imageUrl.isNotEmpty
+                    : ((widget.item.imageUrl?.isNotEmpty ?? false)
                         ? Center(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Image.network(
-                              widget.item.imageUrl,
+                              widget.item.imageUrl ?? '',
                               width: 200,
                               height: 200,
                               fit: BoxFit.cover,

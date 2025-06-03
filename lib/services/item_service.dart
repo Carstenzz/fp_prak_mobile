@@ -78,9 +78,9 @@ class ItemService {
     var request = http.MultipartRequest('POST', uri);
     request.headers['Authorization'] = 'Bearer $token';
     request.fields['name'] = item.name;
-    request.fields['description'] = item.description;
+    request.fields['description'] = item.description ?? '';
     request.fields['quantity'] = item.quantity.toString();
-    request.fields['category_id'] = item.categoryId;
+    request.fields['category_id'] = item.categoryId.toString();
     if (imageFile != null) {
       request.files.add(
         await http.MultipartFile.fromPath('image', imageFile.path),
@@ -113,9 +113,9 @@ class ItemService {
       var request = http.MultipartRequest('PUT', uri);
       request.headers['Authorization'] = 'Bearer $authToken';
       request.fields['name'] = item.name;
-      request.fields['description'] = item.description;
+      request.fields['description'] = item.description ?? '';
       request.fields['quantity'] = item.quantity.toString();
-      request.fields['category_id'] = item.categoryId;
+      request.fields['category_id'] = item.categoryId.toString();
       if (imageFile != null) {
         request.files.add(
           await http.MultipartFile.fromPath('image', imageFile.path),

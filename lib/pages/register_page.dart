@@ -98,7 +98,6 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFFF6F8FB),
       appBar: AppBar(
         title: const Text('Register'),
@@ -121,6 +120,16 @@ class _RegisterPageState extends State<RegisterPage> {
             child: ListView(
               shrinkWrap: true,
               children: [
+                const Text(
+                  'Inventario🤌',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.indigo,
+                  ),
+                ),
+                const SizedBox(height: 24),
                 _buildTextField(_nameController, 'Nama'),
                 _buildTextField(_emailController, 'Email'),
                 _buildTextField(

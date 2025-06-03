@@ -5,18 +5,18 @@ import 'package:meta/meta.dart';
 class Item {
   final String id;
   final String name;
-  final String description;
-  final String imageUrl;
+  final String? description;
+  final String? imageUrl;
   final int quantity;
-  final String categoryId;
-  final String createdBy;
+  final int categoryId;
+  final int createdBy;
   final String createdAt;
 
   const Item({
     required this.id,
     required this.name,
-    required this.description,
-    required this.imageUrl,
+    this.description,
+    this.imageUrl,
     required this.quantity,
     required this.categoryId,
     required this.createdBy,
@@ -29,8 +29,8 @@ class Item {
     description: json['description'],
     imageUrl: json['image_url'],
     quantity: json['quantity'],
-    categoryId: json['category_id'].toString(),
-    createdBy: json['created_by'].toString(),
+    categoryId: json['category_id'],
+    createdBy: json['created_by'],
     createdAt: json['createdAt'],
   );
 

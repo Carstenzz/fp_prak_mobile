@@ -91,7 +91,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFFF6F8FB),
       appBar: AppBar(
         title: const Text('Login'),
@@ -114,6 +113,16 @@ class _LoginPageState extends State<LoginPage> {
             child: ListView(
               shrinkWrap: true,
               children: [
+                const Text(
+                  'Inventario🤌',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.indigo,
+                  ),
+                ),
+                const SizedBox(height: 24),
                 _buildTextField(_emailController, 'Email'),
                 _buildTextField(
                   _passwordController,

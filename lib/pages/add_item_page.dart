@@ -58,11 +58,35 @@ class _AddItemPageState extends State<AddItemPage> {
   }
 
   Future<void> _pickImage() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() {
-        _imageFile = File(picked.path);
-      });
+    final source = await showDialog<ImageSource>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Pilih Sumber Gambar'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text('Kamera'),
+                  onTap: () => Navigator.pop(context, ImageSource.camera),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library),
+                  title: const Text('Galeri'),
+                  onTap: () => Navigator.pop(context, ImageSource.gallery),
+                ),
+              ],
+            ),
+          ),
+    );
+    if (source != null) {
+      final picked = await ImagePicker().pickImage(source: source);
+      if (picked != null) {
+        setState(() {
+          _imageFile = File(picked.path);
+        });
+      }
     }
   }
 
@@ -72,14 +96,16 @@ class _AddItemPageState extends State<AddItemPage> {
     });
     final token = await UserService.getToken();
     if (token == null) return;
+    final userIdStr = await UserService.getUserId();
+    final userId = int.tryParse(userIdStr ?? '0') ?? 0;
     final item = Item(
       id: const Uuid().v4(),
       name: _nameController.text,
       description: _detailController.text,
       imageUrl: _imageFile?.path ?? '',
       quantity: int.tryParse(_quantityController.text) ?? 0,
-      categoryId: _selectedCategoryId ?? '',
-      createdBy: 'dummy_user_id', // TODO: ganti dengan user id login
+      categoryId: int.tryParse(_selectedCategoryId ?? '0') ?? 0,
+      createdBy: userId,
       createdAt: DateTime.now().toIso8601String(),
     );
     await ItemService().addItem(item, token, imageFile: _imageFile);

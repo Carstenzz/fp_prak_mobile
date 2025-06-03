@@ -7,6 +7,7 @@ import 'item_detail_page.dart';
 import '../models/category.dart';
 import '../services/category_service.dart';
 import '../services/user_service.dart';
+import 'chatbot_page.dart';
 
 /// Halaman utama inventaris
 class InventoryPage extends StatefulWidget {
@@ -31,13 +32,21 @@ class _InventoryPageState extends State<InventoryPage> {
   }
 
   Future<void> _loadAll() async {
+    if (!mounted) return;
     setState(() {
       _loading = true;
     });
     final token = await UserService.getToken();
-    if (token == null) return;
+    if (token == null) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+      });
+      return;
+    }
     final items = await ItemService().getItems(token);
     final categories = await CategoryService().getCategories(token);
+    if (!mounted) return;
     setState(() {
       _items = items;
       _categories = categories;
@@ -48,6 +57,7 @@ class _InventoryPageState extends State<InventoryPage> {
   }
 
   void _applyFilter() {
+    if (!mounted) return;
     setState(() {
       _filteredItems =
           _items.where((item) {
@@ -56,7 +66,7 @@ class _InventoryPageState extends State<InventoryPage> {
             );
             final matchCategory =
                 _selectedCategoryId == null ||
-                item.categoryId == _selectedCategoryId;
+                item.categoryId == int.tryParse(_selectedCategoryId ?? '');
             return matchSearch && matchCategory;
           }).toList();
     });
@@ -158,6 +168,43 @@ class _InventoryPageState extends State<InventoryPage> {
                       ],
                     ),
                   ),
+                  // Add Item shortcut at the top
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Tambah Item Baru',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.indigo[700],
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.add_circle,
+                            color: Colors.deepPurple,
+                            size: 32,
+                          ),
+                          tooltip: 'Tambah Item',
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AddItemPage(),
+                              ),
+                            );
+                            _refresh();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                   Expanded(
                     child: ListView.builder(
                       itemCount: _filteredItems.length,
@@ -174,11 +221,11 @@ class _InventoryPageState extends State<InventoryPage> {
                           ),
                           child: ListTile(
                             leading:
-                                item.imageUrl.isNotEmpty
+                                (item.imageUrl?.isNotEmpty ?? false)
                                     ? ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
                                       child: Image.network(
-                                        item.imageUrl,
+                                        item.imageUrl ?? '',
                                         width: 48,
                                         height: 48,
                                         fit: BoxFit.cover,
@@ -202,8 +249,8 @@ class _InventoryPageState extends State<InventoryPage> {
                               ),
                             ),
                             subtitle: Text(
-                              item.description.isNotEmpty
-                                  ? item.description
+                              (item.description?.isNotEmpty ?? false)
+                                  ? item.description!
                                   : 'Qty: ${item.quantity}',
                             ),
                             trailing: Row(
@@ -287,16 +334,14 @@ class _InventoryPageState extends State<InventoryPage> {
                 ],
               ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
-        onPressed: () async {
-          await Navigator.push(
+        heroTag: 'chatbot',
+        backgroundColor: Colors.deepPurple,
+        child: const Icon(Icons.chat, color: Colors.white),
+        onPressed: () {
+          Navigator.of(
             context,
-            MaterialPageRoute(builder: (_) => const AddItemPage()),
-          );
-          _refresh();
+          ).push(MaterialPageRoute(builder: (context) => const ChatbotPage()));
         },
-        child: const Icon(Icons.add),
       ),
     );
   }

@@ -4,6 +4,7 @@ import '../services/category_service.dart';
 import '../services/user_service.dart';
 import 'package:uuid/uuid.dart';
 import 'category_detail_page.dart';
+import 'chatbot_page.dart';
 
 /// Halaman untuk menampilkan dan mengelola kategori
 class CategoryPage extends StatefulWidget {
@@ -247,6 +248,16 @@ class _CategoryPageState extends State<CategoryPage> {
                   ),
                 ],
               ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'chatbot',
+        backgroundColor: Colors.deepPurple,
+        child: const Icon(Icons.chat, color: Colors.white),
+        onPressed: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => const ChatbotPage()));
+        },
+      ),
     );
   }
 }

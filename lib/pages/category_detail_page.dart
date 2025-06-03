@@ -92,13 +92,13 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                                 ),
                                 child: ListTile(
                                   leading:
-                                      item.imageUrl.isNotEmpty
+                                      (item.imageUrl?.isNotEmpty ?? false)
                                           ? ClipRRect(
                                             borderRadius: BorderRadius.circular(
                                               8,
                                             ),
                                             child: Image.network(
-                                              item.imageUrl,
+                                              item.imageUrl ?? '',
                                               width: 48,
                                               height: 48,
                                               fit: BoxFit.cover,
@@ -125,8 +125,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                                     ),
                                   ),
                                   subtitle: Text(
-                                    item.description.isNotEmpty
-                                        ? item.description
+                                    (item.description?.isNotEmpty ?? false)
+                                        ? item.description!
                                         : 'Qty: ${item.quantity}',
                                   ),
                                   onTap: () {

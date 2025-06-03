@@ -43,12 +43,12 @@ class ItemDetailPage extends StatelessWidget {
             child: ListView(
               shrinkWrap: true,
               children: [
-                if (item.imageUrl.isNotEmpty)
+                if (item.imageUrl?.isNotEmpty ?? false)
                   Center(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
-                        item.imageUrl,
+                        item.imageUrl ?? '',
                         width: 200,
                         height: 200,
                         fit: BoxFit.cover,
