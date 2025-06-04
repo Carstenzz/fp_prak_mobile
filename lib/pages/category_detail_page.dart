@@ -25,7 +25,10 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     final token = await UserService.getToken();
     if (token == null) return;
     final items = await ItemService().getItems(token);
-    _items = items.where((i) => i.categoryId == widget.category.id).toList();
+    _items =
+        items
+            .where((i) => i.categoryId == int.tryParse(widget.category.id))
+            .toList();
     setState(() {
       _loading = false;
     });
@@ -134,7 +137,8 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
                                       context,
                                       MaterialPageRoute(
                                         builder:
-                                            (_) => ItemDetailPage(item: item),
+                                            (_) =>
+                                                ItemDetailPage(itemId: item.id),
                                       ),
                                     );
                                   },

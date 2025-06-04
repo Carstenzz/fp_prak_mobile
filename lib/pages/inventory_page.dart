@@ -322,7 +322,8 @@ class _InventoryPageState extends State<InventoryPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => ItemDetailPage(item: item),
+                                  builder:
+                                      (_) => ItemDetailPage(itemId: item.id),
                                 ),
                               );
                             },

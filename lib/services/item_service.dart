@@ -63,7 +63,9 @@ class ItemService {
         }
       }
       if (response.statusCode == 200) {
-        return Item.fromJson(jsonDecode(response.body));
+        final data = jsonDecode(response.body);
+        // Jika ada field category/creator, tetap simpan di toJson()
+        return Item.fromJson(data);
       } else {
         return null;
       }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'package:email_validator/email_validator.dart';
 import '../models/user.dart';
 import '../services/user_service.dart';
 import 'login_page.dart';
@@ -36,6 +37,14 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> _register() async {
+    // Validasi email sebelum register
+    if (!EmailValidator.validate(_emailController.text.trim())) {
+      setState(() {
+        _error = 'Format email tidak valid';
+      });
+      return;
+    }
+
     setState(() {
       _loading = true;
       _error = null;

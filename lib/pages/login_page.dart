@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:email_validator/email_validator.dart';
 import '../services/user_service.dart';
 import 'dashboard_page.dart';
 import 'register_page.dart';
@@ -32,6 +33,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login() async {
+    // Validasi email sebelum login
+    if (!EmailValidator.validate(_emailController.text.trim())) {
+      setState(() {
+        _error = 'Format email tidak valid';
+      });
+      return;
+    }
+
     setState(() {
       _loading = true;
       _error = null;
