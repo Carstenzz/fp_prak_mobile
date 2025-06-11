@@ -175,78 +175,84 @@ class _CategoryPageState extends State<CategoryPage> {
       body:
           _loading
               ? const Center(child: CircularProgressIndicator())
-              : Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _buildTextField(
-                            _nameController,
-                            'Nama Kategori',
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add, color: Colors.indigo),
-                          onPressed: _addCategory,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _categories.length,
-                      itemBuilder: (context, index) {
-                        final category = _categories[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          child: ListTile(
-                            title: Text(
-                              category.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+              : Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _buildTextField(
+                                _nameController,
+                                'Nama Kategori',
                               ),
                             ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.edit,
-                                    color: Colors.indigo,
-                                  ),
-                                  onPressed: () => _editCategory(category),
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () => _deleteCategory(category.id),
-                                ),
-                              ],
+                            IconButton(
+                              icon: const Icon(Icons.add, color: Colors.indigo),
+                              onPressed: _addCategory,
                             ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) => CategoryDetailPage(
-                                        category: category,
-                                      ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: _categories.length,
+                          itemBuilder: (context, index) {
+                            final category = _categories[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              child: ListTile(
+                                title: Text(
+                                  category.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.edit,
+                                        color: Colors.indigo,
+                                      ),
+                                      onPressed: () => _editCategory(category),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed:
+                                          () => _deleteCategory(category.id),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (_) => CategoryDetailPage(
+                                            category: category,
+                                          ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'chatbot',

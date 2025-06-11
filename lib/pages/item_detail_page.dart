@@ -90,77 +90,82 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
         ),
       ),
-      body: FutureBuilder<Map<String, dynamic>?>(
-        future: _fetchItemDetail(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: Text('Gagal memuat detail item.'));
-          }
-          final item = snapshot.data!;
-          return Center(
-            child: Card(
-              elevation: 8,
-              margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    if ((item['image_url'] ?? '').isNotEmpty)
-                      Center(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            item['image_url'] ?? '',
-                            width: 200,
-                            height: 200,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (context, error, stackTrace) => const Icon(
-                                  Icons.broken_image,
-                                  color: Colors.red,
-                                  size: 100,
-                                ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Card(
+            elevation: 8,
+            margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: FutureBuilder<Map<String, dynamic>?>(
+                future: _fetchItemDetail(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data == null) {
+                    return const Center(
+                      child: Text('Gagal memuat detail item.'),
+                    );
+                  }
+                  final item = snapshot.data!;
+                  return ListView(
+                    shrinkWrap: true,
+                    children: [
+                      if ((item['image_url'] ?? '').isNotEmpty)
+                        Center(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              item['image_url'] ?? '',
+                              width: 200,
+                              height: 200,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (context, error, stackTrace) => const Icon(
+                                    Icons.broken_image,
+                                    color: Colors.red,
+                                    size: 100,
+                                  ),
+                            ),
                           ),
                         ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Nama: ${item['name']}',
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Nama: ${item['name']}',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text('Jumlah: ${item['quantity']}'),
-                    const SizedBox(height: 8),
-                    Text('Deskripsi: ${item['description'] ?? '-'}'),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Kategori: ${item['category'] != null ? item['category']['name'] : '-'}',
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Dibuat oleh: ${item['creator'] != null && item['creator']['name'] != null ? item['creator']['name'] : '-'}',
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Email pembuat: ${item['creator'] != null && item['creator']['email'] != null ? item['creator']['email'] : '-'}',
-                    ),
-                    const SizedBox(height: 8),
-                    Text('Dibuat pada: ${_formatDate(item['createdAt'])}'),
-                    const SizedBox(height: 8),
-                    Text('Diupdate pada: ${_formatDate(item['updatedAt'])}'),
-                  ],
-                ),
+                      const SizedBox(height: 8),
+                      Text('Jumlah: ${item['quantity']}'),
+                      const SizedBox(height: 8),
+                      Text('Deskripsi: ${item['description'] ?? '-'}'),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Kategori: ${item['category'] != null ? item['category']['name'] : '-'}',
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Dibuat oleh: ${item['creator'] != null && item['creator']['name'] != null ? item['creator']['name'] : '-'}',
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Email pembuat: ${item['creator'] != null && item['creator']['email'] != null ? item['creator']['email'] : '-'}',
+                      ),
+                      const SizedBox(height: 8),
+                      Text('Dibuat pada: ${_formatDate(item['createdAt'])}'),
+                      const SizedBox(height: 8),
+                      Text('Diupdate pada: ${_formatDate(item['updatedAt'])}'),
+                    ],
+                  );
+                },
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

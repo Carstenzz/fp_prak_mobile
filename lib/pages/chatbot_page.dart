@@ -160,77 +160,84 @@ class _ChatbotPageState extends State<ChatbotPage> {
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              reverse: true,
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final msg = _messages[_messages.length - 1 - index];
-                final isUser = msg['role'] == 'user';
-                return Align(
-                  alignment:
-                      isUser ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: isUser ? Colors.blue[100] : Colors.grey[200],
-                      borderRadius: BorderRadius.circular(12),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  reverse: true,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = _messages[_messages.length - 1 - index];
+                    final isUser = msg['role'] == 'user';
+                    return Align(
+                      alignment:
+                          isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isUser ? Colors.blue[100] : Colors.grey[200],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          msg['text'] ?? '',
+                          style: TextStyle(
+                            color: isUser ? Colors.blue[900] : Colors.black87,
+                            fontWeight:
+                                isUser ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              if (_isLoading)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    // Meme mode toggle icon
+                    IconButton(
+                      icon: Text(
+                        _memeMode ? '😋' : '🤌',
+                        style: TextStyle(fontSize: 28),
+                      ),
+                      tooltip: 'Toggle Meme Mode',
+                      onPressed: _toggleMemeMode,
                     ),
-                    child: Text(
-                      msg['text'] ?? '',
-                      style: TextStyle(
-                        color: isUser ? Colors.blue[900] : Colors.black87,
-                        fontWeight:
-                            isUser ? FontWeight.bold : FontWeight.normal,
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        onSubmitted: _sendMessage,
+                        decoration: const InputDecoration(
+                          hintText: 'Ketik pesan...',
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
-          ),
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: CircularProgressIndicator(),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                // Meme mode toggle icon
-                IconButton(
-                  icon: Text(
-                    _memeMode ? '😋' : '🤌',
-                    style: TextStyle(fontSize: 28),
-                  ),
-                  tooltip: 'Toggle Meme Mode',
-                  onPressed: _toggleMemeMode,
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    onSubmitted: _sendMessage,
-                    decoration: const InputDecoration(
-                      hintText: 'Ketik pesan...',
-                      border: OutlineInputBorder(),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed:
+                          _isLoading
+                              ? null
+                              : () => _sendMessage(_controller.text),
                     ),
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed:
-                      _isLoading ? null : () => _sendMessage(_controller.text),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

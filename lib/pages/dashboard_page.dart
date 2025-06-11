@@ -38,77 +38,88 @@ class DashboardPage extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Inventario🤌',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.indigo,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 24,
-                    horizontal: 32,
-                  ),
-                  leading: const Icon(
-                    Icons.inventory_2,
-                    size: 40,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Inventario🤌',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
                     color: Colors.indigo,
                   ),
-                  title: const Text(
-                    'Manajemen Inventaris',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const InventoryPage()),
-                    );
-                  },
                 ),
-              ),
-              const SizedBox(height: 24),
-              Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
+                const SizedBox(height: 24),
+                Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 24,
+                      horizontal: 32,
+                    ),
+                    leading: const Icon(
+                      Icons.inventory_2,
+                      size: 40,
+                      color: Colors.indigo,
+                    ),
+                    title: const Text(
+                      'Manajemen Inventaris',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const InventoryPage(),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 24,
-                    horizontal: 32,
+                const SizedBox(height: 24),
+                Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
                   ),
-                  leading: const Icon(
-                    Icons.category,
-                    size: 40,
-                    color: Colors.indigo,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 24,
+                      horizontal: 32,
+                    ),
+                    leading: const Icon(
+                      Icons.category,
+                      size: 40,
+                      color: Colors.indigo,
+                    ),
+                    title: const Text(
+                      'Manajemen Kategori',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const CategoryPage()),
+                      );
+                    },
                   ),
-                  title: const Text(
-                    'Manajemen Kategori',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CategoryPage()),
-                    );
-                  },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -117,9 +128,9 @@ class DashboardPage extends StatelessWidget {
         backgroundColor: Colors.deepPurple,
         child: const Icon(Icons.chat, color: Colors.white),
         onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const ChatbotPage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => const ChatbotPage()));
         },
       ),
     );

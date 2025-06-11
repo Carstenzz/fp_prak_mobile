@@ -111,65 +111,68 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       body: Center(
-        child: Card(
-          elevation: 8,
-          margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                const Text(
-                  'Inventario🤌',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.indigo,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Card(
+            elevation: 8,
+            margin: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  const Text(
+                    'Inventario🤌',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.indigo,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                _buildTextField(_emailController, 'Email'),
-                _buildTextField(
-                  _passwordController,
-                  'Password',
-                  isPassword: true,
-                ),
-                if (_error != null) ...[
-                  const SizedBox(height: 8),
-                  Text(_error!, style: const TextStyle(color: Colors.red)),
-                ],
-                const SizedBox(height: 20),
-                _loading
-                    ? const Center(child: CircularProgressIndicator())
-                    : ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.indigo,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  const SizedBox(height: 24),
+                  _buildTextField(_emailController, 'Email'),
+                  _buildTextField(
+                    _passwordController,
+                    'Password',
+                    isPassword: true,
+                  ),
+                  if (_error != null) ...[
+                    const SizedBox(height: 8),
+                    Text(_error!, style: const TextStyle(color: Colors.red)),
+                  ],
+                  const SizedBox(height: 20),
+                  _loading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.indigo,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: _login,
+                        child: const Text(
+                          'Login',
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                      onPressed: _login,
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const RegisterPage()),
-                    );
-                  },
-                  child: const Text('Belum punya akun? Register'),
-                ),
-              ],
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RegisterPage()),
+                      );
+                    },
+                    child: const Text('Belum punya akun? Register'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
