@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../api_endpoints.dart';
 import '../models/item.dart';
 import '../services/user_service.dart';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 /// Service class to handle CRUD operations for items
 class ItemService {
@@ -75,7 +78,38 @@ class ItemService {
   }
 
   /// Tambah item baru
-  Future<void> addItem(Item item, String token, {File? imageFile}) async {
+  Future<void> addItem(Item item, String token, {dynamic imageFile}) async {
+    if (kIsWeb) {
+      var uri = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.postItems);
+      var request = http.MultipartRequest('POST', uri);
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['name'] = item.name;
+      request.fields['description'] = item.description ?? '';
+      request.fields['quantity'] = item.quantity.toString();
+      request.fields['category_id'] = item.categoryId.toString();
+      if (imageFile != null) {
+        final reader = html.FileReader();
+        final completer = Completer<List<int>>();
+        reader.readAsArrayBuffer(imageFile);
+        reader.onLoadEnd.listen((event) {
+          completer.complete(reader.result as List<int>);
+        });
+        final bytes = await completer.future;
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'image',
+            bytes,
+            filename: imageFile.name,
+          ),
+        );
+      }
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode != 201 && response.statusCode != 200) {
+        throw Exception('Failed to add item');
+      }
+      return;
+    }
     var uri = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.postItems);
     var request = http.MultipartRequest('POST', uri);
     request.headers['Authorization'] = 'Bearer $token';
@@ -104,7 +138,43 @@ class ItemService {
   }
 
   /// Update item yang sudah ada
-  Future<void> updateItem(Item item, String token, {File? imageFile}) async {
+  Future<void> updateItem(Item item, String token, {dynamic imageFile}) async {
+    if (kIsWeb) {
+      var uri = Uri.parse(
+        (ApiEndpoints.baseUrl + ApiEndpoints.putItem).replaceFirst(
+          ':id',
+          item.id,
+        ),
+      );
+      var request = http.MultipartRequest('PUT', uri);
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['name'] = item.name;
+      request.fields['description'] = item.description ?? '';
+      request.fields['quantity'] = item.quantity.toString();
+      request.fields['category_id'] = item.categoryId.toString();
+      if (imageFile != null) {
+        final reader = html.FileReader();
+        final completer = Completer<List<int>>();
+        reader.readAsArrayBuffer(imageFile);
+        reader.onLoadEnd.listen((event) {
+          completer.complete(reader.result as List<int>);
+        });
+        final bytes = await completer.future;
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'image',
+            bytes,
+            filename: imageFile.name,
+          ),
+        );
+      }
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update item');
+      }
+      return;
+    }
     Future<http.Response> sendRequest(String authToken) async {
       var uri = Uri.parse(
         (ApiEndpoints.baseUrl + ApiEndpoints.putItem).replaceFirst(

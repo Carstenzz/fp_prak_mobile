@@ -1,13 +1,18 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../models/category.dart';
+import '../models/category.dart' as model_category;
 import '../models/item.dart';
 import '../services/category_service.dart';
 import '../services/item_service.dart';
 import '../services/user_service.dart';
+
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 /// Halaman untuk mengedit item yang sudah ada.
 class EditItemPage extends StatefulWidget {
@@ -22,9 +27,10 @@ class _EditItemPageState extends State<EditItemPage> {
   late final TextEditingController _nameController;
   late final TextEditingController _quantityController;
   late final TextEditingController _descriptionController;
-  File? _imageFile;
+  // Ganti _imageFile menjadi dynamic agar bisa menampung File (mobile) atau html.File (web)
+  dynamic _imageFile;
   bool _loading = false;
-  List<Category> _categories = [];
+  List<model_category.Category> _categories = [];
   String? _selectedCategoryId;
 
   @override
@@ -59,34 +65,48 @@ class _EditItemPageState extends State<EditItemPage> {
   }
 
   Future<void> _pickImage() async {
-    final source = await showDialog<ImageSource>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Pilih Sumber Gambar'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.camera_alt),
-                  title: const Text('Kamera'),
-                  onTap: () => Navigator.pop(context, ImageSource.camera),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library),
-                  title: const Text('Galeri'),
-                  onTap: () => Navigator.pop(context, ImageSource.gallery),
-                ),
-              ],
+    if (kIsWeb) {
+      final uploadInput = html.FileUploadInputElement();
+      uploadInput.accept = 'image/*';
+      uploadInput.click();
+      uploadInput.onChange.listen((event) {
+        final files = uploadInput.files;
+        if (files != null && files.isNotEmpty) {
+          setState(() {
+            _imageFile = files.first;
+          });
+        }
+      });
+    } else {
+      final source = await showDialog<ImageSource>(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Pilih Sumber Gambar'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Kamera'),
+                    onTap: () => Navigator.pop(context, ImageSource.camera),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Galeri'),
+                    onTap: () => Navigator.pop(context, ImageSource.gallery),
+                  ),
+                ],
+              ),
             ),
-          ),
-    );
-    if (source != null) {
-      final picked = await ImagePicker().pickImage(source: source);
-      if (picked != null) {
-        setState(() {
-          _imageFile = File(picked.path);
-        });
+      );
+      if (source != null) {
+        final picked = await ImagePicker().pickImage(source: source);
+        if (picked != null) {
+          setState(() {
+            _imageFile = File(picked.path);
+          });
+        }
       }
     }
   }
@@ -101,7 +121,7 @@ class _EditItemPageState extends State<EditItemPage> {
       id: widget.item.id,
       name: _nameController.text,
       description: _descriptionController.text,
-      imageUrl: _imageFile?.path ?? '',
+      imageUrl: kIsWeb ? '' : (_imageFile?.path ?? ''),
       quantity: int.tryParse(_quantityController.text) ?? 0,
       categoryId: int.tryParse(_selectedCategoryId ?? '0') ?? 0,
       createdBy: widget.item.createdBy,
@@ -230,15 +250,30 @@ class _EditItemPageState extends State<EditItemPage> {
                   ),
                   const SizedBox(height: 8),
                   _imageFile != null
-                      ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          _imageFile!,
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                        ),
-                      )
+                      ? (kIsWeb
+                          ? FutureBuilder<Uint8List>(
+                            future: _imageFile.arrayBuffer().then(
+                              (value) => Uint8List.view(value),
+                            ),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) return const SizedBox();
+                              return Image.memory(
+                                snapshot.data!,
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                              );
+                            },
+                          )
+                          : ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              _imageFile!,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            ),
+                          ))
                       : ((widget.item.imageUrl?.isNotEmpty ?? false)
                           ? Center(
                             child: ClipRRect(

@@ -16,6 +16,19 @@ class SplashPage extends StatelessWidget {
           MaterialPageRoute(builder: (_) => const DashboardPage()),
         );
         return;
+      } else {
+        // Coba refresh token jika access token sudah expired
+        final newToken = await UserService().refreshAccessToken();
+        if (newToken != null) {
+          final user2 = await UserService().getCurrentUser(newToken);
+          if (user2 != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const DashboardPage()),
+            );
+            return;
+          }
+        }
       }
     }
     Navigator.pushReplacement(

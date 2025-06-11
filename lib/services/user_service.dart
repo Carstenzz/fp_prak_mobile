@@ -166,4 +166,15 @@ class UserService {
       return null;
     }
   }
+
+  /// Cek apakah user sudah login (token dan refresh token masih ada)
+  static Future<bool> isLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    final access = prefs.getString(accessTokenKey);
+    final refresh = prefs.getString(refreshTokenKey);
+    return access != null &&
+        refresh != null &&
+        access.isNotEmpty &&
+        refresh.isNotEmpty;
+  }
 }

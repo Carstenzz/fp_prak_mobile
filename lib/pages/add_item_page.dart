@@ -1,11 +1,15 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+// Tambahkan import untuk web
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/item.dart';
-import '../models/category.dart';
+import '../models/category.dart' as model_category;
 import '../services/item_service.dart';
 import '../services/category_service.dart';
 import '../services/user_service.dart';
@@ -22,10 +26,11 @@ class _AddItemPageState extends State<AddItemPage> {
   late final TextEditingController _nameController;
   late final TextEditingController _quantityController;
   late final TextEditingController _detailController;
-  File? _imageFile;
+  // Ganti _imageFile menjadi dynamic agar bisa menampung File (mobile) atau html.File (web)
+  dynamic _imageFile;
   bool _loading = false;
 
-  List<Category> _categories = [];
+  List<model_category.Category> _categories = [];
   String? _selectedCategoryId;
 
   @override
@@ -58,34 +63,48 @@ class _AddItemPageState extends State<AddItemPage> {
   }
 
   Future<void> _pickImage() async {
-    final source = await showDialog<ImageSource>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Pilih Sumber Gambar'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.camera_alt),
-                  title: const Text('Kamera'),
-                  onTap: () => Navigator.pop(context, ImageSource.camera),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library),
-                  title: const Text('Galeri'),
-                  onTap: () => Navigator.pop(context, ImageSource.gallery),
-                ),
-              ],
+    if (kIsWeb) {
+      final uploadInput = html.FileUploadInputElement();
+      uploadInput.accept = 'image/*';
+      uploadInput.click();
+      uploadInput.onChange.listen((event) {
+        final files = uploadInput.files;
+        if (files != null && files.isNotEmpty) {
+          setState(() {
+            _imageFile = files.first;
+          });
+        }
+      });
+    } else {
+      final source = await showDialog<ImageSource>(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Pilih Sumber Gambar'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Kamera'),
+                    onTap: () => Navigator.pop(context, ImageSource.camera),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Galeri'),
+                    onTap: () => Navigator.pop(context, ImageSource.gallery),
+                  ),
+                ],
+              ),
             ),
-          ),
-    );
-    if (source != null) {
-      final picked = await ImagePicker().pickImage(source: source);
-      if (picked != null) {
-        setState(() {
-          _imageFile = File(picked.path);
-        });
+      );
+      if (source != null) {
+        final picked = await ImagePicker().pickImage(source: source);
+        if (picked != null) {
+          setState(() {
+            _imageFile = File(picked.path);
+          });
+        }
       }
     }
   }
@@ -102,7 +121,7 @@ class _AddItemPageState extends State<AddItemPage> {
       id: const Uuid().v4(),
       name: _nameController.text,
       description: _detailController.text,
-      imageUrl: _imageFile?.path ?? '',
+      imageUrl: kIsWeb ? '' : (_imageFile?.path ?? ''),
       quantity: int.tryParse(_quantityController.text) ?? 0,
       categoryId: int.tryParse(_selectedCategoryId ?? '0') ?? 0,
       createdBy: userId,
@@ -231,15 +250,30 @@ class _AddItemPageState extends State<AddItemPage> {
                   ),
                   const SizedBox(height: 8),
                   _imageFile != null
-                      ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          _imageFile!,
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                        ),
-                      )
+                      ? (kIsWeb
+                          ? FutureBuilder<Uint8List>(
+                            future: _imageFile.arrayBuffer().then(
+                              (value) => Uint8List.view(value),
+                            ),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) return const SizedBox();
+                              return Image.memory(
+                                snapshot.data!,
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                              );
+                            },
+                          )
+                          : ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              _imageFile!,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            ),
+                          ))
                       : const SizedBox(),
                   OutlinedButton.icon(
                     onPressed: _pickImage,
